@@ -1,18 +1,21 @@
+# WELCOME TO NINTERNETES OS v0.1
 
-# WELCOME TO NINTERNETES OS v.0.1
-<img width="1434" height="811" alt="image" src="https://github.com/user-attachments/assets/ee3fa9b3-8c00-455a-97c4-37741f2596a0" />
+PowerPC Linux playground.  
+Kernel + initramfs.  
+No distro. No installers. No bullshit.
 
-PowerPC Linux playground — kernel + initramfs, no distro, no bullshit
+NINTERNETES OS is a personal operating system project built from scratch to understand how Linux actually boots, runs, and exposes itself.
 
-NINTERNETES OS is a personal operating system project built from scratch.  
-This is not a Linux distribution. This is not a VM image. This is not “Linux from scratch”.
+This is NOT a Linux distribution.  
+This is NOT a VM image.  
+This is NOT Linux From Scratch.
 
-This is a raw Linux kernel + a handcrafted initramfs, booting directly into a BusyBox shell on PowerPC, with optional SSH access via Dropbear.
+This is a raw Linux kernel paired with a handcrafted initramfs, booting straight into a BusyBox shell on PowerPC hardware emulation.
 
-No systemd  
-No package manager  
-No installer  
-No GUI  
+No systemd.  
+No package manager.  
+No GUI.  
+No abstractions.
 
 Just kernel, userspace, and you.
 
@@ -20,24 +23,32 @@ Just kernel, userspace, and you.
 
 ## What this project is
 
-Custom Linux kernel (PowerPC) compiled manually  
-Minimal initramfs built by hand  
-BusyBox as the only userspace  
-Optional Dropbear SSH server  
-Boots directly to shell  
-Designed to be readable and hackable in an afternoon
+NINTERNETES OS is a learning operating system.
+
+It consists of:
+- A manually compiled Linux kernel for PowerPC
+- A minimal initramfs built by hand
+- BusyBox as the only userspace
+- Optional SSH access via Dropbear
+- Direct boot into a shell as PID 1
+
+No background services.  
+Nothing auto-starts unless you tell it to.  
+Everything is visible, readable, and hackable.
+
+This OS is designed to be understood in an afternoon if you actually look at it.
 
 ---
 
 ## What this project is NOT
 
-Not a general-purpose OS  
-Not secure  
-Not optimized  
-Not production-ready  
-Not pretty  
+This is not a general-purpose OS.  
+This is not secure.  
+This is not optimized.  
+This is not production-ready.  
+This is not pretty.
 
-This is a learning OS.
+This project exists to learn, not to ship.
 
 ---
 
@@ -45,9 +56,9 @@ This is a learning OS.
 
 ninternetes-os  
 ├── kernel  
+│   ├── Linux kernel source tree  
 │   ├── ninternetes.config  
-│   ├── vmlinux  
-│   └── Linux kernel source tree  
+│   └── vmlinux  
 ├── initramfs  
 │   ├── init  
 │   ├── bin  
@@ -60,140 +71,152 @@ ninternetes-os
 ├── initramfs.gz  
 ├── scripts  
 ├── docs  
-└── README.md
+└── README.md  
+
+No magic. No generators. No hidden steps.
 
 ---
 
-## Requirements
+## Tested environments
 
-### macOS
-Homebrew  
-QEMU
+This project has been tested on:
 
-### Linux PC
-QEMU  
-Standard build tools
+macOS  
+- Apple Silicon (ARM64)  
+- QEMU installed via Homebrew  
+- UTM (QEMU wrapper)
+
+Linux  
+- x86_64 host  
+- QEMU system emulation  
+- Standard GNU toolchain
+
+VMware is NOT supported.  
+VMware does not run PowerPC Linux kernels.
+
+If you want a GUI on macOS, use UTM.  
+If you want raw power, use QEMU directly.
 
 ---
 
-## Installing QEMU
+## Required tools
 
-### macOS
-brew install qemu
+macOS:
+- Homebrew
+- QEMU (qemu-system-ppc)
 
-Verify PowerPC support:
+Linux:
+- QEMU with PowerPC support
+- Standard build tools (gcc, make, binutils)
+
+Verify PowerPC support with:
 qemu-system-ppc --version
-
-### Linux
-sudo apt install qemu-system-ppc
 
 ---
 
 ## Running NINTERNETES OS
 
-Recommended way is QEMU PowerPC emulation.
+Recommended method is QEMU PowerPC emulation.
 
-### Boot command
+Boot command:
 
 qemu-system-ppc \
-  -M g3beige \
-  -cpu 750 \
-  -m 256 \
-  -kernel kernel/vmlinux \
-  -initrd initramfs.gz \
-  -append "console=ttyS0,9600 rdinit=/init ip=dhcp" \
-  -netdev user,id=net0,hostfwd=tcp::2222-:22 \
-  -device rtl8139,netdev=net0 \
-  -nographic
+-M g3beige \
+-cpu 750 \
+-m 256 \
+-kernel kernel/vmlinux \
+-initrd initramfs.gz \
+-append "console=ttyS0,9600 rdinit=/init ip=dhcp" \
+-netdev user,id=net0,hostfwd=tcp::2222-:22 \
+-device rtl8139,netdev=net0 \
+-nographic
 
----
+If everything is working, you will see the NINTERNETES OS banner and land directly in a BusyBox shell.
 
-## First boot
-
-You should see a NINTERNETES OS banner and land directly in a BusyBox shell.
-
-<img width="844" height="338" alt="image" src="https://github.com/user-attachments/assets/744de3a3-421f-4a02-ae00-5d036680a0e4" />
-
-
-This is your OS running. No layers. No safety net.
+That shell is PID 1.  
+That is the OS.
 
 ---
 
 ## SSH access (optional)
 
-Dropbear is included but not auto-started.
+Dropbear is included but NOT auto-started.
 
-### Start SSH server inside the OS
+This is intentional.
 
-start-ssh
+Inside the OS:
 
-### Stop SSH server
+start-ssh   -> starts the SSH server  
+stop-ssh    -> stops the SSH server  
 
-stop-ssh
-
-### Connect from host
+From the host:
 
 ssh \
-  -o StrictHostKeyChecking=no \
-  -o UserKnownHostsFile=/dev/null \
-  -i ppc_dropbear_key \
-  -p 2222 \
-  root@127.0.0.1
+-o StrictHostKeyChecking=no \
+-o UserKnownHostsFile=/dev/null \
+-i ppc_dropbear_key \
+-p 2222 root@127.0.0.1
+
+Nothing listens unless you start it.  
+You are always in control.
 
 ---
 
 ## Networking
 
-Uses QEMU user-mode networking  
-Guest gets IP via DHCP  
-Host port 2222 is forwarded to guest port 22  
-Guest has outbound internet access
+- QEMU user-mode networking
+- DHCP inside the guest
+- Outbound internet access works
+- Host port 2222 forwarded to guest port 22
+
+Simple, portable, predictable.
 
 ---
 
 ## Kernel rebuild (optional)
 
-cd kernel  
+Inside kernel directory:
+
 cp ninternetes.config .config  
 make olddefconfig  
-make -j$(nproc) vmlinux
+make -j$(nproc) vmlinux  
+
+Rebuilding the kernel is encouraged.  
+Breaking it is part of the process.
 
 ---
 
 ## Repacking initramfs
 
-cd initramfs  
+From initramfs directory:
+
 find . | cpio -H newc -o | gzip -9 > ../initramfs.gz
 
----
-
-## VMware note
-
-VMware does NOT support PowerPC Linux kernels.
-
-This project will not run on VMware directly.
-
-Use QEMU or UTM (which wraps QEMU).
+No tooling.  
+No frameworks.  
+Just UNIX.
 
 ---
 
 ## Why PowerPC
 
-No shortcuts  
-No distro magic  
-Forces real understanding  
-You actually learn something
+PowerPC removes shortcuts.
+
+No distro assumptions.  
+No copy-paste kernel configs.  
+No accidental success.
+
+If it boots, you earned it.
 
 ---
 
 ## Philosophy
 
-This OS exists to understand how Linux really boots.
-
-PID 1  
-initramfs  
-kernel/userspace boundary  
-minimal userspace  
+This OS exists to understand:
+- How Linux boots
+- What PID 1 really is
+- How initramfs works
+- Where kernel stops and userspace begins
 
 If you break it, good.  
 If you rebuild it, better.  
@@ -204,11 +227,18 @@ If you understand it, mission accomplished.
 ## Credits
 
 Built by Ju4nlux  
-Powered by Linux, BusyBox, Dropbear and QEMU
+Powered by Linux, BusyBox, Dropbear and QEMU  
+
+Late nights. Raw terminals. No safety nets.
 
 ---
 
 ## Final words
 
-This OS is not here to impress.  
+NINTERNETES OS is not here to impress.
+
 It is here to teach.
+
+If you cloned it and learned something, it worked.
+
+Welcome to the OS.
