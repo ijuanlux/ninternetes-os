@@ -1,6 +1,6 @@
-<img width="1434" height="811" alt="image" src="https://github.com/user-attachments/assets/ee3fa9b3-8c00-455a-97c4-37741f2596a0" />
 
-# NINTERNETES OS
+# WELCOME TO NINTERNETES OS
+<img width="1434" height="811" alt="image" src="https://github.com/user-attachments/assets/ee3fa9b3-8c00-455a-97c4-37741f2596a0" />
 
 PowerPC Linux playground — kernel + initramfs, no distro, no bullshit
 
