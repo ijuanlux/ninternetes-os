@@ -1,92 +1,209 @@
 # NINTERNETES OS
-v0.1 – PowerPC  
-Bare metal mindset. No distro. No bullshit.
 
-## What this is
+PowerPC Linux playground — kernel + initramfs, no distro, no bullshit
 
-NINTERNETES OS is a minimal Linux operating system built from scratch
-for PowerPC architecture.
+NINTERNETES OS is a personal operating system project built from scratch.  
+This is not a Linux distribution. This is not a VM image. This is not “Linux from scratch”.
 
-This is not Debian.
-This is not Ubuntu.
-This is not Buildroot.
-This is not Yocto.
+This is a raw Linux kernel + a handcrafted initramfs, booting directly into a BusyBox shell on PowerPC, with optional SSH access via Dropbear.
 
-This is straight-up kernel + initramfs + BusyBox + SSH.
-Nothing hidden. Nothing pre-cooked.
+No systemd  
+No package manager  
+No installer  
+No GUI  
 
-## Why this exists
+Just kernel, userspace, and you.
 
-Because abstractions make you soft.
+---
 
-This project exists to understand:
-- How Linux actually boots
-- What the kernel does before userspace shows up
-- What PID 1 really is
-- How to build a system you can read end-to-end in one afternoon
+## What this project is
 
-If something runs here, it's because you put it there.
+Custom Linux kernel (PowerPC) compiled manually  
+Minimal initramfs built by hand  
+BusyBox as the only userspace  
+Optional Dropbear SSH server  
+Boots directly to shell  
+Designed to be readable and hackable in an afternoon
 
-## Core components
+---
 
-Kernel:
-- Linux 6.6.70
-- PowerPC 32-bit
-- Custom config, hand-tuned
+## What this project is NOT
 
-Initramfs:
-- Static BusyBox
-- Dropbear SSH
-- Handwritten /init
-- No systemd
-- No magic daemons
+Not a general-purpose OS  
+Not secure  
+Not optimized  
+Not production-ready  
+Not pretty  
 
-Userland:
-- BusyBox shell
-- Minimal tooling
-- No persistence by default
+This is a learning OS.
 
-## Boot flow
+---
 
-1. Kernel boots
-2. initramfs is unpacked
-3. /init runs as PID 1
-4. /proc, /sys and /dev get mounted
-5. Network comes up via DHCP
-6. Shell drops in
+## Project structure
 
-SSH does NOT auto-start.
-You own that decision.
+ninternetes-os  
+├── kernel  
+│   ├── ninternetes.config  
+│   ├── vmlinux  
+│   └── Linux kernel source tree  
+├── initramfs  
+│   ├── init  
+│   ├── bin  
+│   ├── sbin  
+│   ├── etc  
+│   ├── root  
+│   │   └── .ssh  
+│   │       └── authorized_keys  
+│   └── minimal root filesystem  
+├── initramfs.gz  
+├── scripts  
+├── docs  
+└── README.md
 
-## SSH control
+---
 
-Start SSH:
+## Requirements
+
+### macOS
+Homebrew  
+QEMU
+
+### Linux PC
+QEMU  
+Standard build tools
+
+---
+
+## Installing QEMU
+
+### macOS
+brew install qemu
+
+Verify PowerPC support:
+qemu-system-ppc --version
+
+### Linux
+sudo apt install qemu-system-ppc
+
+---
+
+## Running NINTERNETES OS
+
+Recommended way is QEMU PowerPC emulation.
+
+### Boot command
+
+qemu-system-ppc \
+  -M g3beige \
+  -cpu 750 \
+  -m 256 \
+  -kernel kernel/vmlinux \
+  -initrd initramfs.gz \
+  -append "console=ttyS0,9600 rdinit=/init ip=dhcp" \
+  -netdev user,id=net0,hostfwd=tcp::2222-:22 \
+  -device rtl8139,netdev=net0 \
+  -nographic
+
+---
+
+## First boot
+
+You should see a NINTERNETES OS banner and land directly in a BusyBox shell.
+
+This is your OS running. No layers. No safety net.
+
+---
+
+## SSH access (optional)
+
+Dropbear is included but not auto-started.
+
+### Start SSH server inside the OS
+
 start-ssh
 
-Stop SSH:
+### Stop SSH server
+
 stop-ssh
 
-That’s it.
-No service managers. No ghosts.
+### Connect from host
 
-## System identity
+ssh \
+  -o StrictHostKeyChecking=no \
+  -o UserKnownHostsFile=/dev/null \
+  -i ppc_dropbear_key \
+  -p 2222 \
+  root@127.0.0.1
 
-uname -a looks like this:
+---
 
-Linux 10.0.2.15 6.6.70-NINTERNETES_OS_v0.1_PowerPC_Powered_by_Ju4nlux
+## Networking
 
-Yeah, the kernel name is custom.
-Yeah, that’s intentional.
+Uses QEMU user-mode networking  
+Guest gets IP via DHCP  
+Host port 2222 is forwarded to guest port 22  
+Guest has outbound internet access
 
-## Who this is for
+---
 
-- Linux engineers
-- Kernel nerds
-- Infra people who want the real deal
-- Anyone tired of bloated stacks and fake complexity
+## Kernel rebuild (optional)
 
-If you want comfort, look elsewhere.
-If you want control, welcome home.
+cd kernel  
+cp ninternetes.config .config  
+make olddefconfig  
+make -j$(nproc) vmlinux
 
-Powered by Ju4nlux.
-Built by hand. Old school. No mercy.
+---
+
+## Repacking initramfs
+
+cd initramfs  
+find . | cpio -H newc -o | gzip -9 > ../initramfs.gz
+
+---
+
+## VMware note
+
+VMware does NOT support PowerPC Linux kernels.
+
+This project will not run on VMware directly.
+
+Use QEMU or UTM (which wraps QEMU).
+
+---
+
+## Why PowerPC
+
+No shortcuts  
+No distro magic  
+Forces real understanding  
+You actually learn something
+
+---
+
+## Philosophy
+
+This OS exists to understand how Linux really boots.
+
+PID 1  
+initramfs  
+kernel/userspace boundary  
+minimal userspace  
+
+If you break it, good.  
+If you rebuild it, better.  
+If you understand it, mission accomplished.
+
+---
+
+## Credits
+
+Built by Ju4nlux  
+Powered by Linux, BusyBox, Dropbear and QEMU
+
+---
+
+## Final words
+
+This OS is not here to impress.  
+It is here to teach.
