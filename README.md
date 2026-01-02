@@ -1,141 +1,92 @@
-NINTERNETES OS
-==============
+# NINTERNETES OS
+v0.1 – PowerPC  
+Bare metal mindset. No distro. No bullshit.
 
-NINTERNETES OS es un sistema Linux mínimo para PowerPC construido a mano.
-Kernel vanilla, BusyBox, initramfs propio y ejecución directa sobre QEMU
-emulando hardware Power Macintosh clásico.
+## What this is
 
-No es una distro.
-No es un fork.
-No es un experimento académico.
+NINTERNETES OS is a minimal Linux operating system built from scratch
+for PowerPC architecture.
 
-Es un sistema operativo real, pequeño y entendible, pensado para aprender,
-tocar y romper sin capas mágicas por encima.
+This is not Debian.
+This is not Ubuntu.
+This is not Buildroot.
+This is not Yocto.
 
----
+This is straight-up kernel + initramfs + BusyBox + SSH.
+Nothing hidden. Nothing pre-cooked.
 
-Qué es
-------
+## Why this exists
 
-- Linux 6.6.x compilado manualmente para PowerPC
-- Initramfs propio con BusyBox
-- Arranque directo con QEMU (sin GRUB, sin systemd)
-- Red funcional por DHCP
-- Dropbear SSH opcional
-- Todo controlado desde /init
+Because abstractions make you soft.
 
----
+This project exists to understand:
+- How Linux actually boots
+- What the kernel does before userspace shows up
+- What PID 1 really is
+- How to build a system you can read end-to-end in one afternoon
 
-Qué no es
----------
+If something runs here, it's because you put it there.
 
-- No usa systemd
-- No usa Buildroot
-- No usa Yocto
-- No usa OpenWRT
-- No usa ningún framework de build automático
+## Core components
 
-Aquí se ve todo. Si algo arranca, sabes por qué.
+Kernel:
+- Linux 6.6.70
+- PowerPC 32-bit
+- Custom config, hand-tuned
 
----
+Initramfs:
+- Static BusyBox
+- Dropbear SSH
+- Handwritten /init
+- No systemd
+- No magic daemons
 
-Estructura del repositorio
---------------------------
+Userland:
+- BusyBox shell
+- Minimal tooling
+- No persistence by default
 
-kernel/
-  Árbol completo del kernel Linux compilado para PowerPC
-  Incluye .config y binarios generados
+## Boot flow
 
-initramfs/
-  Root filesystem en RAM
-  Contiene /init, BusyBox y configuración mínima
+1. Kernel boots
+2. initramfs is unpacked
+3. /init runs as PID 1
+4. /proc, /sys and /dev get mounted
+5. Network comes up via DHCP
+6. Shell drops in
 
-initramfs.gz
-  Initramfs empaquetado listo para QEMU
+SSH does NOT auto-start.
+You own that decision.
 
-scripts/
-  Scripts auxiliares para build, arranque y utilidades
+## SSH control
 
-docs/
-  Documentación adicional del proyecto
+Start SSH:
+start-ssh
 
----
+Stop SSH:
+stop-ssh
 
-Requisitos
-----------
+That’s it.
+No service managers. No ghosts.
 
-- Host Linux
-- qemu-system-ppc
-- gcc powerpc-linux-gnu
-- make, cpio, gzip
+## System identity
 
-En Debian/Ubuntu:
+uname -a looks like this:
 
-  apt install qemu-system-ppc gcc-powerpc-linux-gnu cpio gzip make
+Linux 10.0.2.15 6.6.70-NINTERNETES_OS_v0.1_PowerPC_Powered_by_Ju4nlux
 
----
+Yeah, the kernel name is custom.
+Yeah, that’s intentional.
 
-Arranque
---------
+## Who this is for
 
-Desde la raíz del repo:
+- Linux engineers
+- Kernel nerds
+- Infra people who want the real deal
+- Anyone tired of bloated stacks and fake complexity
 
-  qemu-system-ppc \
-    -M g3beige \
-    -cpu 750 \
-    -m 256 \
-    -kernel kernel/vmlinux \
-    -initrd initramfs.gz \
-    -append "console=ttyS0 rdinit=/init ip=dhcp" \
-    -netdev user,id=net0 \
-    -device rtl8139,netdev=net0 \
-    -nographic
+If you want comfort, look elsewhere.
+If you want control, welcome home.
 
-Si todo va bien, aparecerá el banner de NINTERNETES OS y una shell BusyBox.
-
----
-
-SSH (opcional)
---------------
-
-Dropbear puede lanzarse manualmente dentro del sistema:
-
-  /sbin/dropbear -F -p 22
-
-Desde el host:
-
-  ssh root@IP_DEL_PPC
-
-La clave pública debe estar en:
-
-  /root/.ssh/authorized_keys
-
----
-
-Identidad del sistema
----------------------
-
-El sistema se identifica como:
-
-  Linux 6.6.x-NINTERNETES_OS_v0.1_PowerPC_Powered_by_Ju4nlux
-
-Nada de genéricos.
-
----
-
-Motivación
-----------
-
-Entender Linux desde abajo.
-Ver qué pasa entre el kernel y la shell.
-Tener un sistema que puedas leer entero en una tarde.
-
----
-
-Autor
------
-
-Ju4nlux  
-Proyecto personal  
-Madrid  
-
+Powered by Ju4nlux.
+Built by hand. Old school. No mercy.
