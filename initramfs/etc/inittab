@@ -1,0 +1,8 @@
+::sysinit:/bin/mount -t proc proc /proc
+::sysinit:/bin/mount -t sysfs sysfs /sys
+::sysinit:/bin/mount -t devtmpfs devtmpfs /dev
+
+ttyS0::respawn:/bin/sh
+
+::ctrlaltdel:/bin/umount -a -r
+::shutdown:/bin/umount -a -r

@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "[-] Stopping Dropbear SSH"
+killall dropbear 2>/dev/null || echo "Dropbear not running"

@@ -1,0 +1,15 @@
+*.o
+*.a
+*.gz
+*.img
+*.tmp
+*.log
+*.swp
+*.pid
+*.bin
+*.strip
+*.symvers
+modules.order
+modules.builtin
+Module.symvers
+.vscode

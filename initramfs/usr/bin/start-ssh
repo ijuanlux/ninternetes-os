@@ -1,0 +1,14 @@
+#!/bin/sh
+echo "[+] Starting Dropbear SSH on port 2222"
+
+# Asegurar dirs
+mkdir -p /etc/dropbear /var/run
+
+# Generar key si no existe
+[ -f /etc/dropbear/dropbear_rsa_host_key ] || \
+  dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key
+
+# Arrancar dropbear en background
+/sbin/dropbear -r /etc/dropbear/dropbear_rsa_host_key -p 2222
+
+echo "[+] SSH started"
