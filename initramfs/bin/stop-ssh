@@ -1,2 +1,4 @@
 #!/bin/sh
-killall dropbear 2>/dev/null
+
+echo "[+] Stopping Dropbear SSH"
+killall dropbear 2>/dev/null || true
