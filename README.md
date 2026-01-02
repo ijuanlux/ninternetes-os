@@ -112,6 +112,9 @@ qemu-system-ppc \
 
 You should see a NINTERNETES OS banner and land directly in a BusyBox shell.
 
+<img width="844" height="338" alt="image" src="https://github.com/user-attachments/assets/744de3a3-421f-4a02-ae00-5d036680a0e4" />
+
+
 This is your OS running. No layers. No safety net.
 
 ---
