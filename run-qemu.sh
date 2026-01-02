@@ -1,23 +1,29 @@
 #!/bin/bash
 
-set -e
+KERNEL=kernel/vmlinux
+INITRD=initramfs.gz
 
-KERNEL="./kernel/vmlinux"
-INITRD="./initramfs.gz"
-
-if [[ ! -f "$KERNEL" ]]; then
+if [ ! -f "$KERNEL" ]; then
   echo "[!] Kernel not found at $KERNEL"
+  echo "[!] You must build the kernel first."
+  echo
+  echo "From kernel/ directory:"
+  echo "  cp ninternetes.config .config"
+  echo "  make olddefconfig"
+  echo "  make -j\$(nproc) vmlinux"
   exit 1
 fi
 
-if [[ ! -f "$INITRD" ]]; then
+if [ ! -f "$INITRD" ]; then
   echo "[!] initramfs.gz not found"
+  echo "[!] You must pack the initramfs first."
+  echo
+  echo "From initramfs/ directory:"
+  echo "  find . | cpio -H newc -o | gzip -9 > ../initramfs.gz"
   exit 1
 fi
 
-echo "[+] Booting NINTERNETES OS (PowerPC)"
-
-qemu-system-ppc \
+exec qemu-system-ppc \
   -M g3beige \
   -cpu 750 \
   -m 256 \
